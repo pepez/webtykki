@@ -147,20 +147,22 @@ async def main():
                 ball_speed_y = (350 * math.sin(cannon_angle2)*-1)* dt
                 ball_pos = pygame.Vector2(cannon2_end_x, cannon2_end_y)
 
-        if keys[pygame.K_a]:
+        if keys[pygame.K_a] and cannon_angle1 < math.pi:
             cannon_angle1 += 0.5 * dt
-        if keys[pygame.K_d]:
+        if keys[pygame.K_d] and cannon_angle1 > 0:
             cannon_angle1 -= 0.5 * dt
-
-        if keys[pygame.K_j]:
+        if keys[pygame.K_j] and cannon_angle2 < math.pi:
             cannon_angle2 += 0.5 * dt
-        if keys[pygame.K_l]:
+        if keys[pygame.K_l] and cannon_angle2 > 0:
             cannon_angle2 -= 0.5 * dt
         if keys[pygame.K_r]:
             score1 = 0
             score2 = 0
             player_turn = 1
             ground_hits = []
+            cannon_angle1 = math.pi / 3
+            cannon_angle2 = math.pi*2 / 3
+            windwandy = (random.random() - 0.5) *2
 
         # Score
         textpos = pygame.Vector2(560, 50)
