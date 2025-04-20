@@ -5,7 +5,7 @@ import asyncio
 
 async def main():
     # pygame setup
-    pygame.mixer.init()
+    pygame.mixer.pre_init(44100, 16, 2, 4096)
     pygame.init()
     screen = pygame.display.set_mode((1280, 720))
     clock = pygame.time.Clock()
