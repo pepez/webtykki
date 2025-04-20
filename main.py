@@ -36,6 +36,10 @@ async def main():
     global font
     font=pygame.font.Font(None,50)
 
+    cannon_sound = pygame.mixer.Sound("cannon-shot.wav")
+    explosion_sound = pygame.mixer.Sound("explosion.wav")
+    ground_hit_sound = pygame.mixer.Sound("distant-explosion.wav")
+
     def cannon_draw(x, cannon_end_x, cannon_end_y):
         #pygame.draw.arc(screen, "black", (x,550,60,60), 0, math.pi)
         pygame.draw.line(screen, (50,50,50), (x+30,580),(cannon_end_x, cannon_end_y), 5)
@@ -96,8 +100,8 @@ async def main():
 
         flag_wave += 0.1
         flag_edge_x = 640 + windwandy * 60
-        flag_edge_y = (1 - abs(windwandy)) * 40 + math.sin(flag_wave)*4
-        flag_vertices = [(640, 450),(640, 490),(flag_edge_x, 480+flag_edge_y), (flag_edge_x, 460+flag_edge_y)]
+        flag_edge_y = (1 - abs(windwandy)) * 40 + math.sin(flag_wave)*5*abs(windwandy)
+        flag_vertices = [(640, 450),(640, 490),(flag_edge_x + math.cos(flag_wave*2)*3, 480+flag_edge_y), (flag_edge_x + math.cos(flag_wave)*2, 460+flag_edge_y)]
         pygame.draw.polygon(screen, "yellow", flag_vertices) 
 
 
@@ -118,15 +122,18 @@ async def main():
 
             if ball_pos.y > 600:
                 ball_hit = True
+                pygame.mixer.Sound.play(ground_hit_sound)
                 ground_hits.append(ball_pos)
 
             if ball_pos.y > 550 and ball_pos.x > (cannon2_x) and ball_pos.x < (cannon2_x + 60):
                 ball_hit = True
+                pygame.mixer.Sound.play(explosion_sound)
                 score1 = score1 + 1
                 screen.fill("red")
 
             if ball_pos.y > 550 and ball_pos.x > (cannon1_x) and ball_pos.x < (cannon1_x + 60):
                 ball_hit = True
+                pygame.mixer.Sound.play(explosion_sound)
                 score2 = score2 + 1
                 screen.fill("red")
 
@@ -138,6 +145,8 @@ async def main():
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and ball_visible == False:
             ball_visible = True
+            pygame.mixer.Sound.play(cannon_sound)
+
             if player_turn == 1:
                 ball_speed_x = 350 * math.cos(cannon_angle1) * dt
                 ball_speed_y = (350 * math.sin(cannon_angle1)*-1)* dt
@@ -162,7 +171,7 @@ async def main():
             ground_hits = []
             cannon_angle1 = math.pi / 3
             cannon_angle2 = math.pi*2 / 3
-            windwandy = (random.random() - 0.5) *2
+            windwandy = (random.random() - 0.5) *2               
 
         # Score
         textpos = pygame.Vector2(560, 50)
