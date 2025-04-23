@@ -33,6 +33,10 @@ async def main():
     red_power_change = 5
 
     flag_wave = 0
+    game_time = 60
+    game_time_lock = 0 
+    game_play = 0 # 0 = ajan säätö, 1 = peli, 2 = game over
+
     
     global font
     font=pygame.font.Font(None,50)
@@ -144,8 +148,12 @@ async def main():
                 windwandy = (random.random() - 0.5) *2
             
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and ball_visible == False:
+        if keys[pygame.K_SPACE] and ball_visible == False and (game_play == 0 or game_play == 1):
             ball_visible = True
+            
+            if (game_play == 0):
+                game_play = 1
+            
             pygame.mixer.Sound.play(cannon_sound)
 
             if player_turn == 1:
@@ -165,21 +173,55 @@ async def main():
             cannon_angle2 += 0.5 * dt
         if keys[pygame.K_l] and cannon_angle2 > 0:
             cannon_angle2 -= 0.5 * dt
-        if keys[pygame.K_r]:
+        if keys[pygame.K_y] and game_time_lock <= 0:
             score1 = 0
             score2 = 0
             player_turn = 1
             ground_hits = []
             cannon_angle1 = math.pi / 3
             cannon_angle2 = math.pi*2 / 3
-            windwandy = (random.random() - 0.5) *2               
+            windwandy = (random.random() - 0.5) *2
+            ball_visible = False
+            game_play = 0
+            game_time = 60
+            game_time_lock = 1
+            
+        if keys[pygame.K_u] and game_play == 0 and game_time > 60 and game_time_lock <= 0:
+            game_time = game_time - 60
+            game_time_lock = 0.2
+        if keys[pygame.K_i] and game_play == 0 and game_time_lock <= 0:
+            game_time = game_time + 60    
+            game_time_lock = 0.2
 
-        # Score
-        textpos = pygame.Vector2(560, 50)
-        color=(255,255,255)
-        screen.blit(font.render("SCORE",True,color),textpos)
-        textpos = pygame.Vector2(600, 90)
-        screen.blit(font.render(str(score1)+" - "+str(score2),True,color),textpos)
+
+        if (game_play == 0):
+            textpos = pygame.Vector2(460, 50)
+            color=(255,255,255)
+            screen.blit(font.render("Next player",True,color),textpos)
+        if (game_play == 1):
+            # Score text
+            textpos = pygame.Vector2(460, 50)
+            color=(255,255,255)
+            screen.blit(font.render("SCORE",True,color),textpos)
+            textpos = pygame.Vector2(500, 90)
+            screen.blit(font.render(str(score1)+" - "+str(score2),True,color),textpos)
+        if (game_play == 2):
+            # Score text
+            textpos = pygame.Vector2(460, 50)
+            color=(255,255,255)
+            screen.blit(font.render("Game Over - SCORE",True,color),textpos)
+            textpos = pygame.Vector2(500, 90)
+            screen.blit(font.render(str(score1)+" - "+str(score2),True,color),textpos)
+
+        # Time text
+        if (game_play == 0 or game_play == 1):
+            textpos = pygame.Vector2(800, 50)
+            color=(255,255,255)
+            screen.blit(font.render("Time left",True,color),textpos)
+            textpos = pygame.Vector2(800, 90)
+            seconds = math.floor(game_time % 60)
+            minutes = math.floor(game_time / 60)
+            screen.blit(font.render(str(minutes)+" : "+str(seconds),True,color),textpos)
 
         # Player turn marker
         red_power = red_power + red_power_change
@@ -200,6 +242,16 @@ async def main():
         # dt is delta time in seconds since last frame, used for framerate-
         # independent physics.
         dt = clock.tick(60) / 1000
+
+        if (game_play == 1):
+            game_time = game_time - dt
+
+        if (game_time < 0):
+            game_play = 2
+
+        if (game_time_lock > 0):
+            game_time_lock = game_time_lock - dt
+
         await asyncio.sleep(0)
 
 asyncio.run(main())
