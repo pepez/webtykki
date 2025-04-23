@@ -114,7 +114,7 @@ async def main():
         if ball_visible:
             pygame.draw.circle(screen, "red", ball_pos, 3)
             ball_speed_y = ball_speed_y + GRAVITY*dt
-            ball_speed_x = ball_speed_x + windwandy*dt
+            ball_speed_x = ball_speed_x + (windwandy/2)*dt
             ball_pos = pygame.Vector2(ball_pos.x+ball_speed_x, ball_pos.y+ball_speed_y)
 
             #pygame.draw.rect(screen, "pink", (cannon2_x, 550, 60, 30), 3)
@@ -185,7 +185,7 @@ async def main():
             game_play = 0
             game_time = 60
             game_time_lock = 1
-            
+
         if keys[pygame.K_u] and game_play == 0 and game_time > 60 and game_time_lock <= 0:
             game_time = game_time - 60
             game_time_lock = 0.2
